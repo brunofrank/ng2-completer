@@ -16,6 +16,7 @@ export class RemoteData extends CompleterBaseData {
     private _dataField: string | null = null;
     private _headers: Headers;
     private _requestOptions: RequestOptions;
+    private _dataMapper = (data: any) => data;
 
 
     constructor(private http: Http) {
@@ -31,6 +32,10 @@ export class RemoteData extends CompleterBaseData {
 
     public urlFormater(urlFormater: (term: string) => string) {
         this._urlFormater = urlFormater;
+    }
+
+    public dataMapper(fnc:any) {
+        this._dataMapper = fnc;
     }
 
     public dataField(dataField: string) {
@@ -75,6 +80,7 @@ export class RemoteData extends CompleterBaseData {
                 let matches = this.extractValue(data, this._dataField);
                 return this.extractMatches(matches, term);
             })
+            .map(this._dataMapper)
             .catch(() => [])
             .subscribe((matches: any[]) => {
                 let results = this.processResults(matches);
